@@ -22,29 +22,29 @@ var Sticky = /*#__PURE__*/function () {
    * @param {string} options - Global options for sticky elements (could be overwritten by data-{option}="" attributes)
    */
   function Sticky() {
-    var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     _classCallCheck(this, Sticky);
 
     this.selector = selector;
     this.elements = [];
-    this.version = '1.3.0';
+    this.version = "1.3.0";
     this.vp = this.getViewportSize();
-    this.body = document.querySelector('body');
+    this.body = document.querySelector("body");
     this.options = {
       wrap: options.wrap || false,
-      wrapWith: options.wrapWith || '<span></span>',
+      wrapWith: options.wrapWith || "<span></span>",
       marginTop: options.marginTop || 0,
       marginBottom: options.marginBottom || 0,
       stickyFor: options.stickyFor || 0,
       stickyClass: options.stickyClass || null,
-      stickyContainer: options.stickyContainer || 'body'
+      stickyContainer: options.stickyContainer || "body"
     };
     this.updateScrollTopPosition = this.updateScrollTopPosition.bind(this);
     this.updateScrollTopPosition();
-    window.addEventListener('load', this.updateScrollTopPosition);
-    window.addEventListener('scroll', this.updateScrollTopPosition);
+    window.addEventListener("load", this.updateScrollTopPosition);
+    window.addEventListener("scroll", this.updateScrollTopPosition);
     this.run();
   }
   /**
@@ -53,16 +53,28 @@ var Sticky = /*#__PURE__*/function () {
    */
 
 
-  _createClass(Sticky, [{
+  return _createClass(Sticky, [{
     key: "run",
     value: function run() {
       var _this = this;
 
       // wait for page to be fully loaded
       var pageLoaded = setInterval(function () {
-        if (document.readyState === 'complete') {
+        if (document.readyState === "complete") {
           clearInterval(pageLoaded);
-          var elements = document.querySelectorAll(_this.selector);
+          var elements;
+
+          if (typeof _this.selector === "string") {
+            elements = document.querySelectorAll(_this.selector);
+          } else if (_this.selector && _this.selector.length !== undefined) {
+            elements = _this.selector;
+          } else {
+            elements = [_this.selector];
+          }
+
+          if (elements.length === 0) {
+            console.warn("stickier-js warning: selected nodelist is of length 0");
+          }
 
           _this.forEach(elements, function (element) {
             return _this.renderElement(element);
@@ -85,11 +97,11 @@ var Sticky = /*#__PURE__*/function () {
       element.sticky = {}; // set default variables
 
       element.sticky.active = false;
-      element.sticky.marginTop = parseInt(element.getAttribute('data-margin-top')) || this.options.marginTop;
-      element.sticky.marginBottom = parseInt(element.getAttribute('data-margin-bottom')) || this.options.marginBottom;
-      element.sticky.stickyFor = parseInt(element.getAttribute('data-sticky-for')) || this.options.stickyFor;
-      element.sticky.stickyClass = element.getAttribute('data-sticky-class') || this.options.stickyClass;
-      element.sticky.wrap = element.hasAttribute('data-sticky-wrap') ? true : this.options.wrap; // @todo attribute for stickyContainer
+      element.sticky.marginTop = parseInt(element.getAttribute("data-margin-top")) || this.options.marginTop;
+      element.sticky.marginBottom = parseInt(element.getAttribute("data-margin-bottom")) || this.options.marginBottom;
+      element.sticky.stickyFor = parseInt(element.getAttribute("data-sticky-for")) || this.options.stickyFor;
+      element.sticky.stickyClass = element.getAttribute("data-sticky-class") || this.options.stickyClass;
+      element.sticky.wrap = element.hasAttribute("data-sticky-wrap") ? true : this.options.wrap; // @todo attribute for stickyContainer
       // element.sticky.stickyContainer = element.getAttribute('data-sticky-container') || this.options.stickyContainer;
 
       element.sticky.stickyContainer = this.options.stickyContainer;
@@ -97,7 +109,7 @@ var Sticky = /*#__PURE__*/function () {
       element.sticky.container.rect = this.getRectangle(element.sticky.container);
       element.sticky.rect = this.getRectangle(element); // fix when element is image that has not yet loaded and width, height = 0
 
-      if (element.tagName.toLowerCase() === 'img') {
+      if (element.tagName.toLowerCase() === "img") {
         element.onload = function () {
           return element.sticky.rect = _this2.getRectangle(element);
         };
@@ -119,7 +131,7 @@ var Sticky = /*#__PURE__*/function () {
   }, {
     key: "wrapElement",
     value: function wrapElement(element) {
-      element.insertAdjacentHTML('beforebegin', element.getAttribute('data-sticky-wrapWith') || this.options.wrapWith);
+      element.insertAdjacentHTML("beforebegin", element.getAttribute("data-sticky-wrapWith") || this.options.wrapWith);
       element.previousSibling.appendChild(element);
     }
     /**
@@ -166,7 +178,7 @@ var Sticky = /*#__PURE__*/function () {
         return _this3.onResizeEvents(element);
       };
 
-      window.addEventListener('resize', element.sticky.resizeListener);
+      window.addEventListener("resize", element.sticky.resizeListener);
     }
     /**
      * Removes element listener from resize event
@@ -177,7 +189,7 @@ var Sticky = /*#__PURE__*/function () {
   }, {
     key: "destroyResizeEvents",
     value: function destroyResizeEvents(element) {
-      window.removeEventListener('resize', element.sticky.resizeListener);
+      window.removeEventListener("resize", element.sticky.resizeListener);
     }
     /**
      * Function which is fired when user resize window. It checks if element should be activated or deactivated and then run setPosition function
@@ -215,7 +227,7 @@ var Sticky = /*#__PURE__*/function () {
         return _this4.onScrollEvents(element);
       };
 
-      window.addEventListener('scroll', element.sticky.scrollListener);
+      window.addEventListener("scroll", element.sticky.scrollListener);
     }
     /**
      * Removes element listener from scroll event
@@ -226,7 +238,7 @@ var Sticky = /*#__PURE__*/function () {
   }, {
     key: "destroyScrollEvents",
     value: function destroyScrollEvents(element) {
-      window.removeEventListener('scroll', element.sticky.scrollListener);
+      window.removeEventListener("scroll", element.sticky.scrollListener);
     }
     /**
      * Function which is fired when user scroll window. If element is active, function is invoking setPosition function
@@ -251,10 +263,10 @@ var Sticky = /*#__PURE__*/function () {
     key: "setPosition",
     value: function setPosition(element) {
       this.css(element, {
-        position: '',
-        width: '',
-        top: '',
-        left: ''
+        position: "",
+        width: "",
+        top: "",
+        left: ""
       });
 
       if (this.vp.height < element.sticky.rect.height || !element.sticky.active) {
@@ -267,18 +279,18 @@ var Sticky = /*#__PURE__*/function () {
 
       if (element.sticky.wrap) {
         this.css(element.parentNode, {
-          display: 'block',
-          width: element.sticky.rect.width + 'px',
-          height: element.sticky.rect.height + 'px'
+          display: "block",
+          width: element.sticky.rect.width + "px",
+          height: element.sticky.rect.height + "px"
         });
       }
 
       if (element.sticky.rect.top === 0 && element.sticky.container === this.body) {
         this.css(element, {
-          position: 'fixed',
-          top: element.sticky.rect.top + 'px',
-          left: element.sticky.rect.left + 'px',
-          width: element.sticky.rect.width + 'px'
+          position: "fixed",
+          top: element.sticky.rect.top + "px",
+          left: element.sticky.rect.left + "px",
+          width: element.sticky.rect.width + "px"
         });
 
         if (element.sticky.stickyClass) {
@@ -286,9 +298,9 @@ var Sticky = /*#__PURE__*/function () {
         }
       } else if (this.scrollTop > element.sticky.rect.top - element.sticky.marginTop) {
         this.css(element, {
-          position: 'fixed',
-          width: element.sticky.rect.width + 'px',
-          left: element.sticky.rect.left + 'px'
+          position: "fixed",
+          width: element.sticky.rect.width + "px",
+          left: element.sticky.rect.left + "px"
         });
 
         if (this.scrollTop + element.sticky.rect.height + element.sticky.marginTop > element.sticky.container.rect.top + element.sticky.container.offsetHeight - element.sticky.marginBottom) {
@@ -297,7 +309,7 @@ var Sticky = /*#__PURE__*/function () {
           }
 
           this.css(element, {
-            top: element.sticky.container.rect.top + element.sticky.container.offsetHeight - (this.scrollTop + element.sticky.rect.height + element.sticky.marginBottom) + 'px'
+            top: element.sticky.container.rect.top + element.sticky.container.offsetHeight - (this.scrollTop + element.sticky.rect.height + element.sticky.marginBottom) + "px"
           });
         } else {
           if (element.sticky.stickyClass) {
@@ -305,7 +317,7 @@ var Sticky = /*#__PURE__*/function () {
           }
 
           this.css(element, {
-            top: element.sticky.marginTop + 'px'
+            top: element.sticky.marginTop + "px"
           });
         }
       } else {
@@ -314,17 +326,17 @@ var Sticky = /*#__PURE__*/function () {
         }
 
         this.css(element, {
-          position: '',
-          width: '',
-          top: '',
-          left: ''
+          position: "",
+          width: "",
+          top: "",
+          left: ""
         });
 
         if (element.sticky.wrap) {
           this.css(element.parentNode, {
-            display: '',
-            width: '',
-            height: ''
+            display: "",
+            width: "",
+            height: ""
           });
         }
       }
@@ -358,8 +370,8 @@ var Sticky = /*#__PURE__*/function () {
     value: function destroy() {
       var _this6 = this;
 
-      window.removeEventListener('load', this.updateScrollTopPosition);
-      window.removeEventListener('scroll', this.updateScrollTopPosition);
+      window.removeEventListener("load", this.updateScrollTopPosition);
+      window.removeEventListener("scroll", this.updateScrollTopPosition);
       this.forEach(this.elements, function (element) {
         _this6.destroyResizeEvents(element);
 
@@ -380,7 +392,7 @@ var Sticky = /*#__PURE__*/function () {
     value: function getStickyContainer(element) {
       var container = element.parentNode;
 
-      while (!container.hasAttribute('data-sticky-container') && !container.parentNode.querySelector(element.sticky.stickyContainer) && container !== this.body) {
+      while (!container.hasAttribute("data-sticky-container") && !container.parentNode.querySelector(element.sticky.stickyContainer) && container !== this.body) {
         container = container.parentNode;
       }
 
@@ -397,10 +409,10 @@ var Sticky = /*#__PURE__*/function () {
     key: "getRectangle",
     value: function getRectangle(element) {
       this.css(element, {
-        position: '',
-        width: '',
-        top: '',
-        left: ''
+        position: "",
+        width: "",
+        top: "",
+        left: ""
       });
       var width = Math.max(element.offsetWidth, element.clientWidth, element.scrollWidth);
       var height = Math.max(element.offsetHeight, element.clientHeight, element.scrollHeight);
@@ -476,8 +488,6 @@ var Sticky = /*#__PURE__*/function () {
       }
     }
   }]);
-
-  return Sticky;
 }();
 /**
  * Export function that supports AMD, CommonJS and Plain Browser.
@@ -485,9 +495,9 @@ var Sticky = /*#__PURE__*/function () {
 
 
 (function (root, factory) {
-  if (typeof exports !== 'undefined') {
+  if (typeof exports !== "undefined") {
     module.exports = factory;
-  } else if (typeof define === 'function' && define.amd) {
+  } else if (typeof define === "function" && define.amd) {
     define([], function () {
       return factory;
     });
