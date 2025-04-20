@@ -8,10 +8,10 @@
     />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <title>Sticky.js</title>
+    <title>Stickier.js</title>
     <meta
       name="description"
-      content="Sticky.js is a library written in vanilla javascript. With this library you can easliy add sticky elements to your site which are sticky to whole page or it's parent container"
+      content="Stickier.js is a library written in TypeScript with support for plain JavaScript. With this library you can easliy add sticky elements to your site which are sticky to whole page or it's parent container"
     />
 
     <link
@@ -91,14 +91,16 @@
       <div class="top-bar-left">
         <ul class="menu">
           <li class="menu-text">
-            <h1>Sticky.js</h1>
+            <h1>Stickier.js</h1>
           </li>
         </ul>
       </div>
       <div class="top-bar-right">
         <ul class="menu">
           <li class="">
-            <a href="https://github.com/rgalus/sticky-js" title="Sticky.js"
+            <a
+              href="https://github.com/J-S-Bach/stickier-js"
+              title="Stickier.js"
               ><i class="fa fa-github fa-2x"></i><strong>GitHub</strong></a
             >
           </li>
@@ -112,7 +114,7 @@
           <img
             src="http://placehold.it/250x250"
             class="float-left"
-            alt="Sticky"
+            alt="Stickier"
             data-sticky
             data-sticky-for="1023"
             data-sticky-class="is-sticky"
@@ -122,7 +124,7 @@
           <div class="float-right">
             <img
               src="http://placehold.it/250x250"
-              alt="Sticky"
+              alt="Stickier"
               data-sticky
               data-sticky-wrap
               data-margin-top="100"
@@ -140,14 +142,14 @@
           <img
             src="http://placehold.it/250x250"
             class="float-left"
-            alt="Sticky"
+            alt="Stickier"
             data-sticky
             data-margin-top="100"
           />
           <img
             src="http://placehold.it/250x250"
             class="float-right"
-            alt="Sticky"
+            alt="Stickier"
             data-sticky
             data-sticky-for="1023"
             data-margin-top="100"
@@ -160,14 +162,14 @@
           <img
             src="http://placehold.it/250x250"
             class="float-left"
-            alt="Sticky"
+            alt="Stickier"
             data-sticky-for-element
             data-margin-top="100"
           />
           <img
             src="http://placehold.it/250x250"
             class="float-right"
-            alt="Sticky"
+            alt="Stickier"
             data-sticky-for-element
             data-margin-top="100"
           />
@@ -176,28 +178,29 @@
     </main>
 
     <footer class="text-center">
-      <p>Sticky.js</p>
+      <p>Stickier.js</p>
       <p>
         Created by
-        <a href="https://github.com/rgalus" title="Sticky.js">Rafał Gałus</a>
+        <a href="https://github.com/J-S-Bach" title="Stickier.js">J-S-Bach</a>
       </p>
       <p>
-        <a href="https://github.com/rgalus/sticky-js" title="Sticky.js"
+        <a href="https://github.com/J-S-Bach/stickier-js" title="Stickier.js"
           ><i class="fa fa-github fa-2x"></i
         ></a>
       </p>
     </footer>
 
-    <script src="../dist/sticky.compile.js"></script>
+    <script type="text/javascript" src="../dist/stickier.compile.cjs"></script>
 
     <script>
-      var sticky = new Sticky("[data-sticky]", {});
+      console.log(Stickier)
+      var sticky = new Stickier("[data-sticky]", {});
 
       const stickyElements = document.querySelectorAll(
         "[data-sticky-for-element]"
       );
 
-      var stickyWithElement = new Sticky(stickyElements);
+      var stickyWithElement = new Stickier(stickyElements);
     </script>
   </body>
 </html>
