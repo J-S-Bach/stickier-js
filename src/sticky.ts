@@ -1,24 +1,102 @@
+//TODO: Autogenerate
+
 /**
  * Sticky.js
  * Library for sticky elements written in vanilla javascript. With this library you can easily set sticky elements on your website. It's also responsive.
  *
- * @version 1.3.0
+ * @version 0.0.1
  * @author Rafal Galus <biuro@rafalgalus.pl>
  * @website https://rgalus.github.io/sticky-js/
  * @repo https://github.com/rgalus/sticky-js
  * @license https://github.com/rgalus/sticky-js/blob/master/LICENSE
  */
 
+type SelectableElement = string | HTMLElement | NodeListOf<HTMLElement>;
+
+type FinalRenderElement = HTMLElement & NothingNullable<AdditionalElementProps>;
+
+type Rectangle = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
+type NothingNullable<T> = T extends Object
+  ? T extends Function
+    ? NonNullable<T>
+    : {
+        [P in keyof T]-?: NothingNullable<T[P]>;
+      }
+  : NonNullable<T>;
+
+type Options = {
+  wrap: boolean;
+  wrapWith: string;
+  marginTop: number;
+  marginBottom: number;
+  stickyFor: number;
+  stickyClass: string | null;
+  //TODO: Add support for Element. Currently is queryString for domElement
+  stickyContainer: string;
+};
+
+type AdditionalElementProps = {
+  sticky?: {
+    onResize?: () => void;
+    onScroll?: () => void;
+    active?: boolean;
+    marginTop?: number;
+    marginBottom?: number;
+    stickyFor?: number;
+    stickyClass?: string | null;
+    wrap?: boolean;
+    stickyContainer?: string;
+    container?: HTMLElement | null;
+    containerRect?: Rectangle;
+    rect?: Rectangle;
+    scrollTop?: number;
+  };
+};
+
+const consoleWarn = (...messages: any[]) =>
+  console.warn("sticker-js warn:", ...messages);
+
 class Sticky {
+  rawElements: HTMLElement[] = [];
+  finalElements: FinalRenderElement[];
+  version: string;
+  vp: {
+    width: number;
+    height: number;
+  };
+  body: HTMLBodyElement | null = null;
+  options: Options;
+  scrollTop = 0;
+
   /**
    * Sticky instance constructor
    * @constructor
    * @param {string} selector - Selector which we can find elements
    * @param {string} options - Global options for sticky elements (could be overwritten by data-{option}="" attributes)
    */
-  constructor(selector = "", options = {}) {
-    this.selector = selector;
-    this.elements = [];
+  constructor(selector: SelectableElement, options: Partial<Options> = {}) {
+    let elements: HTMLElement[];
+
+    if (typeof selector === "string") {
+      // Apparently its fine to type querySelectorAll as HTMLElement
+      elements = [...document.querySelectorAll(selector)] as HTMLElement[];
+    } else if (selector instanceof HTMLElement) {
+      elements = [selector];
+    } else if (selector.length !== undefined) {
+      elements = [...selector];
+    } else {
+      throw new Error("Fallthrough case!");
+    }
+
+    this.rawElements = elements;
+
+    this.finalElements = [];
 
     this.version = "1.3.0";
 
@@ -54,21 +132,9 @@ class Sticky {
       if (document.readyState === "complete") {
         clearInterval(pageLoaded);
 
-        let elements;
-
-        if (typeof this.selector === "string") {
-          elements = document.querySelectorAll(this.selector);
-        } else if (this.selector && this.selector.length !== undefined) {
-          elements = this.selector;
-        } else {
-          elements = [this.selector];
-        }
-
-        if (elements.length === 0) {
-          console.warn("stickier-js warning: selected nodelist is of length 0");
-        }
-
-        this.forEach(elements, (element) => this.renderElement(element));
+        this.rawElements.forEach((element) => {
+          this.renderElement(element);
+        });
       }
     }, 10);
   }
@@ -78,47 +144,70 @@ class Sticky {
    * @function
    * @param {node} element - Element to be rendered
    */
-  renderElement(element) {
+  renderElement(element: HTMLElement) {
+    const enrichableElement: HTMLElement & AdditionalElementProps = element;
+
     // create container for variables needed in future
-    element.sticky = {};
+    enrichableElement.sticky = {};
 
     // set default variables
-    element.sticky.active = false;
+    enrichableElement.sticky.active = false;
 
-    element.sticky.marginTop =
-      parseInt(element.getAttribute("data-margin-top")) ||
-      this.options.marginTop;
-    element.sticky.marginBottom =
-      parseInt(element.getAttribute("data-margin-bottom")) ||
-      this.options.marginBottom;
-    element.sticky.stickyFor =
-      parseInt(element.getAttribute("data-sticky-for")) ||
-      this.options.stickyFor;
-    element.sticky.stickyClass =
-      element.getAttribute("data-sticky-class") || this.options.stickyClass;
-    element.sticky.wrap = element.hasAttribute("data-sticky-wrap")
-      ? true
-      : this.options.wrap;
+    const attributeMarginTop = element.getAttribute("data-margin-top");
+    const attributeMarginBottom = element.getAttribute("data-margin-bottom");
+    const attributeStickyForm = element.getAttribute("data-sticky-for");
+    const attributeStickyClass = element.getAttribute("data-sticky-class");
+    const attributeHasWrap = element.hasAttribute("data-sticky-wrap");
+
+    enrichableElement.sticky.marginTop = attributeMarginTop
+      ? parseInt(attributeMarginTop)
+      : this.options.marginTop;
+
+    enrichableElement.sticky.marginBottom = attributeMarginBottom
+      ? parseInt(attributeMarginBottom)
+      : this.options.marginBottom;
+
+    enrichableElement.sticky.stickyFor = attributeStickyForm
+      ? parseInt(attributeStickyForm)
+      : this.options.stickyFor;
+
+    enrichableElement.sticky.stickyClass = attributeStickyClass
+      ? attributeStickyClass
+      : this.options.stickyClass;
+
+    enrichableElement.sticky.wrap = attributeHasWrap ? true : this.options.wrap;
     // @todo attribute for stickyContainer
     // element.sticky.stickyContainer = element.getAttribute('data-sticky-container') || this.options.stickyContainer;
-    element.sticky.stickyContainer = this.options.stickyContainer;
+    enrichableElement.sticky.stickyContainer = this.options.stickyContainer;
 
-    element.sticky.container = this.getStickyContainer(element);
-    element.sticky.container.rect = this.getRectangle(element.sticky.container);
+    enrichableElement.sticky.container = this.getStickyContainer(
+      enrichableElement as FinalRenderElement
+    );
 
-    element.sticky.rect = this.getRectangle(element);
+    enrichableElement.sticky.containerRect = this.getRectangle(
+      enrichableElement.sticky.container
+    );
+
+    enrichableElement.sticky.rect = this.getRectangle(element);
 
     // fix when element is image that has not yet loaded and width, height = 0
     if (element.tagName.toLowerCase() === "img") {
-      element.onload = () => (element.sticky.rect = this.getRectangle(element));
+      element.onload = () => {
+        enrichableElement.sticky = {
+          ...(enrichableElement.sticky as NonNullable<
+            (typeof enrichableElement)["sticky"]
+          >),
+          rect: this.getRectangle(element),
+        };
+      };
     }
 
-    if (element.sticky.wrap) {
+    if (enrichableElement.sticky.wrap) {
       this.wrapElement(element);
     }
 
     // activate rendered element
-    this.activate(element);
+    this.activate(enrichableElement as FinalRenderElement);
   }
 
   /**
@@ -126,12 +215,17 @@ class Sticky {
    * @function
    * @param {node} element - Element to be wrapped
    */
-  wrapElement(element) {
+  wrapElement(element: HTMLElement) {
     element.insertAdjacentHTML(
       "beforebegin",
       element.getAttribute("data-sticky-wrapWith") || this.options.wrapWith
     );
-    element.previousSibling.appendChild(element);
+
+    if (element.previousSibling === null) {
+      consoleWarn("'element.previousSibling' not existing on node", element);
+    }
+
+    element.previousSibling?.appendChild(element);
   }
 
   /**
@@ -139,29 +233,27 @@ class Sticky {
    * @function
    * @param {node} element - Element to be activated
    */
-  activate(element) {
+  activate(element: FinalRenderElement) {
     if (
       element.sticky.rect.top + element.sticky.rect.height <
-        element.sticky.container.rect.top +
-          element.sticky.container.rect.height &&
+        element.sticky.containerRect.top +
+          element.sticky.containerRect.height &&
       element.sticky.stickyFor < this.vp.width &&
       !element.sticky.active
     ) {
       element.sticky.active = true;
     }
 
-    if (this.elements.indexOf(element) < 0) {
-      this.elements.push(element);
+    if (this.finalElements.indexOf(element) < 0) {
+      this.finalElements.push(element);
     }
 
-    if (!element.sticky.resizeEvent) {
+    if (!element.sticky.onResize) {
       this.initResizeEvents(element);
-      element.sticky.resizeEvent = true;
     }
 
-    if (!element.sticky.scrollEvent) {
+    if (!element.sticky.onScroll) {
       this.initScrollEvents(element);
-      element.sticky.scrollEvent = true;
     }
 
     this.setPosition(element);
@@ -172,9 +264,9 @@ class Sticky {
    * @function
    * @param {node} element - Element for which resize events are initialised
    */
-  initResizeEvents(element) {
-    element.sticky.resizeListener = () => this.onResizeEvents(element);
-    window.addEventListener("resize", element.sticky.resizeListener);
+  initResizeEvents(element: FinalRenderElement) {
+    element.sticky.onResize = () => this.onResizeEvents(element);
+    window.addEventListener("resize", element.sticky.onResize);
   }
 
   /**
@@ -182,8 +274,8 @@ class Sticky {
    * @function
    * @param {node} element - Element from which listener is deleted
    */
-  destroyResizeEvents(element) {
-    window.removeEventListener("resize", element.sticky.resizeListener);
+  destroyResizeEvents(element: FinalRenderElement) {
+    window.removeEventListener("resize", element.sticky.onResize);
   }
 
   /**
@@ -191,24 +283,24 @@ class Sticky {
    * @function
    * @param {node} element - Element for which event function is fired
    */
-  onResizeEvents(element) {
+  onResizeEvents(element: FinalRenderElement) {
     this.vp = this.getViewportSize();
 
     element.sticky.rect = this.getRectangle(element);
-    element.sticky.container.rect = this.getRectangle(element.sticky.container);
+    element.sticky.containerRect = this.getRectangle(element.sticky.container);
 
     if (
       element.sticky.rect.top + element.sticky.rect.height <
-        element.sticky.container.rect.top +
-          element.sticky.container.rect.height &&
+        element.sticky.containerRect.top +
+          element.sticky.containerRect.height &&
       element.sticky.stickyFor < this.vp.width &&
       !element.sticky.active
     ) {
       element.sticky.active = true;
     } else if (
       element.sticky.rect.top + element.sticky.rect.height >=
-        element.sticky.container.rect.top +
-          element.sticky.container.rect.height ||
+        element.sticky.containerRect.top +
+          element.sticky.containerRect.height ||
       (element.sticky.stickyFor >= this.vp.width && element.sticky.active)
     ) {
       element.sticky.active = false;
@@ -222,9 +314,9 @@ class Sticky {
    * @function
    * @param {node} element - Element for which scroll events are initialised
    */
-  initScrollEvents(element) {
-    element.sticky.scrollListener = () => this.onScrollEvents(element);
-    window.addEventListener("scroll", element.sticky.scrollListener);
+  initScrollEvents(element: FinalRenderElement) {
+    element.sticky.onScroll = () => this.onScrollEvents(element);
+    window.addEventListener("scroll", element.sticky.onScroll);
   }
 
   /**
@@ -232,8 +324,8 @@ class Sticky {
    * @function
    * @param {node} element - Element from which listener is deleted
    */
-  destroyScrollEvents(element) {
-    window.removeEventListener("scroll", element.sticky.scrollListener);
+  destroyScrollEvents(element: FinalRenderElement) {
+    window.removeEventListener("scroll", element.sticky.onScroll);
   }
 
   /**
@@ -241,7 +333,7 @@ class Sticky {
    * @function
    * @param {node} element - Element for which event function is fired
    */
-  onScrollEvents(element) {
+  onScrollEvents(element: FinalRenderElement) {
     if (element.sticky && element.sticky.active) {
       this.setPosition(element);
     }
@@ -252,7 +344,7 @@ class Sticky {
    * @function
    * @param {node} element - Element that will be positioned if it's active
    */
-  setPosition(element) {
+  setPosition(element: FinalRenderElement) {
     this.css(element, { position: "", width: "", top: "", left: "" });
 
     if (this.vp.height < element.sticky.rect.height || !element.sticky.active) {
@@ -264,7 +356,7 @@ class Sticky {
     }
 
     if (element.sticky.wrap) {
-      this.css(element.parentNode, {
+      this.css(element.parentElement, {
         display: "block",
         width: element.sticky.rect.width + "px",
         height: element.sticky.rect.height + "px",
@@ -273,6 +365,7 @@ class Sticky {
 
     if (
       element.sticky.rect.top === 0 &&
+      //@ts-ignore
       element.sticky.container === this.body
     ) {
       this.css(element, {
@@ -296,7 +389,7 @@ class Sticky {
 
       if (
         this.scrollTop + element.sticky.rect.height + element.sticky.marginTop >
-        element.sticky.container.rect.top +
+        element.sticky.containerRect.top +
           element.sticky.container.offsetHeight -
           element.sticky.marginBottom
       ) {
@@ -306,7 +399,7 @@ class Sticky {
 
         this.css(element, {
           top:
-            element.sticky.container.rect.top +
+            element.sticky.containerRect.top +
             element.sticky.container.offsetHeight -
             (this.scrollTop +
               element.sticky.rect.height +
@@ -328,7 +421,7 @@ class Sticky {
       this.css(element, { position: "", width: "", top: "", left: "" });
 
       if (element.sticky.wrap) {
-        this.css(element.parentNode, { display: "", width: "", height: "" });
+        this.css(element.parentElement, { display: "", width: "", height: "" });
       }
     }
   }
@@ -338,9 +431,9 @@ class Sticky {
    * @function
    */
   update() {
-    this.forEach(this.elements, (element) => {
+    this.finalElements.forEach((element) => {
       element.sticky.rect = this.getRectangle(element);
-      element.sticky.container.rect = this.getRectangle(
+      element.sticky.containerRect = this.getRectangle(
         element.sticky.container
       );
 
@@ -357,10 +450,9 @@ class Sticky {
     window.removeEventListener("load", this.updateScrollTopPosition);
     window.removeEventListener("scroll", this.updateScrollTopPosition);
 
-    this.forEach(this.elements, (element) => {
+    this.finalElements.forEach((element) => {
       this.destroyResizeEvents(element);
       this.destroyScrollEvents(element);
-      delete element.sticky;
     });
   }
 
@@ -370,15 +462,26 @@ class Sticky {
    * @param {node} element - Element which sticky container are looked for
    * @return {node} element - Sticky container
    */
-  getStickyContainer(element) {
-    let container = element.parentNode;
+  getStickyContainer(
+    element: HTMLElement & { sticky: { stickyContainer: string } }
+  ) {
+    let container = element.parentElement;
 
+    if (container === null || container === undefined) {
+      throw new Error(
+        "Initial parentElement of element" + element.nodeName + "is null"
+      );
+    }
+
+    // Search for data-sticky-container if available. go further up the dom.
     while (
-      !container.hasAttribute("data-sticky-container") &&
-      !container.parentNode.querySelector(element.sticky.stickyContainer) &&
+      !container!.hasAttribute("data-sticky-container") &&
+      !container!.parentElement?.querySelector(
+        element.sticky.stickyContainer
+      ) &&
       container !== this.body
     ) {
-      container = container.parentNode;
+      container = container!.parentElement;
     }
 
     return container;
@@ -390,7 +493,14 @@ class Sticky {
    * @param {node} element - Element which position & rectangle are returned
    * @return {object}
    */
-  getRectangle(element) {
+  getRectangle = <T extends null | HTMLElement>(
+    element: T
+  ): T extends null ? undefined : Rectangle => {
+    if (element === null) {
+      //@ts-ignore - TODO: Fix
+      return undefined;
+    }
+
     this.css(element, { position: "", width: "", top: "", left: "" });
 
     const width = Math.max(
@@ -410,11 +520,13 @@ class Sticky {
     do {
       top += element.offsetTop || 0;
       left += element.offsetLeft || 0;
+      //@ts-ignore
       element = element.offsetParent;
     } while (element);
 
+    //@ts-ignore - TODO: Fix
     return { top, left, width, height };
-  }
+  };
 
   /**
    * Function that returns viewport dimensions
@@ -441,20 +553,8 @@ class Sticky {
    */
   updateScrollTopPosition() {
     this.scrollTop =
-      (window.pageYOffset || document.scrollTop) - (document.clientTop || 0) ||
-      0;
-  }
-
-  /**
-   * Helper function for loops
-   * @helper
-   * @param {array}
-   * @param {function} callback - Callback function (no need for explanation)
-   */
-  forEach(array, callback) {
-    for (let i = 0, len = array.length; i < len; i++) {
-      callback(array[i]);
-    }
+      (window.pageYOffset || document.documentElement.scrollTop) -
+        (document.documentElement.clientTop || 0) || 0;
   }
 
   /**
@@ -463,9 +563,12 @@ class Sticky {
    * @param {node} element - DOM element
    * @param {object} properties - CSS properties that will be added/removed from specified element
    */
-  css(element, properties) {
+  css(
+    element: HTMLElement | null,
+    properties: { [key in keyof Partial<HTMLElement["style"]>]: string }
+  ) {
     for (let property in properties) {
-      if (properties.hasOwnProperty(property)) {
+      if (element && properties.hasOwnProperty(property)) {
         element.style[property] = properties[property];
       }
     }
@@ -478,11 +581,14 @@ class Sticky {
 ((root, factory) => {
   if (typeof exports !== "undefined") {
     module.exports = factory;
+    //@ts-ignore
   } else if (typeof define === "function" && define.amd) {
+    //@ts-ignore
     define([], function () {
       return factory;
     });
   } else {
+    //@ts-ignore
     root.Sticky = factory;
   }
 })(this, Sticky);
