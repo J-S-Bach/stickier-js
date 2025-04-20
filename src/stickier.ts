@@ -62,7 +62,7 @@ type AdditionalElementProps = {
 const consoleWarn = (...messages: any[]) =>
   console.warn("sticker-js warn:", ...messages);
 
-class Sticky {
+class Stickier {
   rawElements: HTMLElement[] = [];
   finalElements: FinalRenderElement[];
   version: string;
@@ -91,7 +91,8 @@ class Sticky {
     } else if (selector.length !== undefined) {
       elements = [...selector];
     } else {
-      throw new Error("Fallthrough case!");
+      elements = [];
+      consoleWarn("Has been initialized without any targets.");
     }
 
     this.rawElements = elements;
@@ -365,8 +366,7 @@ class Sticky {
 
     if (
       element.sticky.rect.top === 0 &&
-      //@ts-ignore
-      element.sticky.container === this.body
+      element.sticky.container.isSameNode(this.body)
     ) {
       this.css(element, {
         position: "fixed",
@@ -374,6 +374,7 @@ class Sticky {
         left: element.sticky.rect.left + "px",
         width: element.sticky.rect.width + "px",
       });
+
       if (element.sticky.stickyClass) {
         element.classList.add(element.sticky.stickyClass);
       }
@@ -575,20 +576,4 @@ class Sticky {
   }
 }
 
-/**
- * Export function that supports AMD, CommonJS and Plain Browser.
- */
-((root, factory) => {
-  if (typeof exports !== "undefined") {
-    module.exports = factory;
-    //@ts-ignore
-  } else if (typeof define === "function" && define.amd) {
-    //@ts-ignore
-    define([], function () {
-      return factory;
-    });
-  } else {
-    //@ts-ignore
-    root.Sticky = factory;
-  }
-})(this, Sticky);
+export default Stickier;

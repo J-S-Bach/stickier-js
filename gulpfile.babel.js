@@ -38,18 +38,18 @@ const tsProject = ts.createProject("tsconfig.json", { declaration: true });
  * Compile ts
  */
 export function compileTs() {
-  const tsResults = gulp.src("./src/sticky.ts").pipe(tsProject());
+  const tsResults = gulp.src("./src/stickier.ts").pipe(tsProject());
 
   return merge([
     tsResults.dts.pipe(gulp.dest("./dist/")),
     tsResults.js
       .pipe(babel())
-      .pipe(rename("sticky.compile.js"))
+      .pipe(rename("stickier.compile.js"))
       .pipe(gulp.dest("./dist/"))
       .pipe(size({ title: "compiled:" }))
       .pipe(uglify())
       .pipe(size({ title: "minified:" }))
-      .pipe(rename("sticky.min.js"))
+      .pipe(rename("stickier.min.js"))
       .pipe(gulp.dest("./dist/"))
       .pipe(gzip())
       .pipe(size({ title: "gzipped:" }))
