@@ -2,7 +2,11 @@
   "name": "stickier-js",
   "version": "0.0.1",
   "description": "Sticky elements with support for TS and direct Elements",
-  "exports": "./dist/stickier.min.js",
+  "exports": {
+    "import": "./dist/stickier.min.mjs",
+    "require": "./dist/stickier.min.cjs",
+    "types": "./dist/stickier.d.ts"
+  },
   "types": "./dist/stickier.d.ts",
   "scripts": {
     "start": "gulp",
@@ -32,6 +36,7 @@
   "homepage": "https://github.com/J-S-Bach/stickier-js/#readme",
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
     "@babel/preset-env": "^7.9.5",
     "@babel/register": "^7.9.0",
     "browser-sync": "^2.26.7",

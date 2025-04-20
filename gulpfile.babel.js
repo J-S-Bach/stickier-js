@@ -17,6 +17,7 @@ import gzip from "gulp-gzip";
 import ts from "gulp-typescript";
 import browser_sync from "browser-sync";
 import merge from "merge2";
+import pkg from "./package.json";
 
 /*
  * Create browserSync instance
@@ -41,19 +42,37 @@ export function compileTs() {
   const tsResults = gulp.src("./src/stickier.ts").pipe(tsProject());
 
   return merge([
-    tsResults.dts.pipe(gulp.dest("./dist/")),
+    tsResults.dts.pipe(rename(pkg.types)).pipe(gulp.dest("./")),
+    //Once for esm
     tsResults.js
-      .pipe(babel())
-      .pipe(rename("stickier.compile.js"))
+      .pipe(babel({}))
+      .pipe(rename("stickier.compile.mjs"))
       .pipe(gulp.dest("./dist/"))
       .pipe(size({ title: "compiled:" }))
       .pipe(uglify())
       .pipe(size({ title: "minified:" }))
-      .pipe(rename("stickier.min.js"))
-      .pipe(gulp.dest("./dist/"))
+      .pipe(rename(pkg.exports.import))
+      .pipe(gulp.dest("./"))
       .pipe(gzip())
       .pipe(size({ title: "gzipped:" }))
-      .pipe(gulp.dest("./dist/")),
+      .pipe(gulp.dest("./")),
+    //Once for cjs
+    tsResults.js
+      .pipe(
+        babel({
+          plugins: [["@babel/plugin-transform-modules-commonjs"]],
+        })
+      )
+      .pipe(rename("stickier.compile.cjs"))
+      .pipe(gulp.dest("./dist/"))
+      .pipe(size({ title: "compiled:" }))
+      .pipe(uglify())
+      .pipe(size({ title: "minified:" }))
+      .pipe(rename(pkg.exports.require))
+      .pipe(gulp.dest("./"))
+      .pipe(gzip())
+      .pipe(size({ title: "gzipped:" }))
+      .pipe(gulp.dest("./")),
   ]);
 }
 
