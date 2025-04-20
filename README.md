@@ -1,15 +1,12 @@
 # stickier-js
 
-[![npm version](https://badge.fury.io/js/sticky-js.svg)](https://badge.fury.io/js/sticky-js)
-[![Bower version](https://badge.fury.io/bo/sticky.js.svg)](https://badge.fury.io/bo/sticky.js)
+**👏👏 This package is a fork of rgalus (biuro@rafalgalus.pl) [sticky.js](https://github.com/rgalus/sticky-js). Most of the code is written by them. 👏👏**
 
 > Sticky-js is a library for sticky elements written in vanilla javascript. With this library you can easily set sticky elements on your website. It's also responsive.
 
-[DEMO](https://rgalus.github.io/sticky-js/)
-
 ## Features
 
-- Written in vanilla javascript, no dependencies needed
+- Written in typescript, compiled to vanilla JavaScript with additional types, no dependencies needed
 - Lightweight (minified: ~8.4kb, gzipped: ~2.5kb)
 - It can be sticky to the entire page or to selected parent container
 - No additional CSS needed
@@ -18,79 +15,6 @@
 
 ```
 npm install stickier-js
-```
-
-## Usage
-
-Simply add `stickier.min.js`
-
-```html
-<script src="stickier.min.js"></script>
-```
-
-or, with commonJS:
-
-```js
-var Sticky = require("stickier-js");
-
-var sticky = new Sticky(".selector");
-```
-
-and initialize with:
-
-```html
-<div class="selector">Sticky element</div>
-<script>
-  const sticky = new Sticky(".selector");
-</script>
-```
-
-or, with a query selector:
-
-```html
-<div>Sticky element 1</div>
-<div>Sticky element 2</div>
-<script>
-  const stickyElements = document.querySelectorAll("div");
-
-  const sticky = new Sticky(stickyElements);
-</script>
-```
-
-## Examples
-
-Multiple sticky elements with data-sticky-container and [options](https://github.com/J-S-Bach/stickier-js#available-options)
-
-```html
-<div class="row" data-sticky-container>
-  <div class="medium-2 columns">
-    <img
-      src="http://placehold.it/250x250"
-      class="sticky"
-      data-margin-top="20"
-      data-sticky-for="1023"
-      data-sticky-class="is-sticky"
-    />
-  </div>
-  <div class="medium-8 columns">
-    <h1>Sticky-js</h1>
-    <p>Lorem ipsum.....</p>
-  </div>
-  <div class="medium-2 columns">
-    <img
-      src="http://placehold.it/250x250"
-      class="sticky"
-      data-margin-top="20"
-      data-sticky-for="1023"
-      data-sticky-class="is-sticky"
-    />
-  </div>
-</div>
-
-<script src="sticky.min.js"></script>
-<script>
-  var sticky = new Sticky(".sticky");
-</script>
 ```
 
 ## Methods
@@ -124,6 +48,8 @@ sticky.destroy();
 ### Development
 
 Clone this repository and run
+
+I am not planning to actively maintain this repository. I will update this repo if I need something and I am happy to review your PR, but I will not work on your issue. 
 
 ```js
 npm start

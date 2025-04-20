@@ -5,10 +5,10 @@
  * Library for sticky elements written in vanilla javascript. With this library you can easily set sticky elements on your website. It's also responsive.
  *
  * @version 0.0.1
- * @author Rafal Galus <biuro@rafalgalus.pl>
- * @website https://rgalus.github.io/sticky-js/
- * @repo https://github.com/rgalus/sticky-js
- * @license https://github.com/rgalus/sticky-js/blob/master/LICENSE
+ * @author J-S-Bach
+ * @website https://github.com/J-S-Bach/stickier-js
+ * @repo https://github.com/J-S-Bach/stickier-js
+ * @license https://github.com/J-S-Bach/stickier-js/blob/master/LICENSE
  */
 
 type SelectableElement = string | HTMLElement | NodeListOf<HTMLElement>;
@@ -31,13 +31,34 @@ type NothingNullable<T> = T extends Object
   : NonNullable<T>;
 
 type Options = {
+  /**
+   * Adds a wrapper element for the stickier element. The wrapper element is determined with wrapWith. Defaults to false
+   */
   wrap: boolean;
+  /**
+   * Element that wraps the stickier element. Only useful if wrap is true. Defaults to `span`
+   */
   wrapWith: string;
+  /**
+   * Top margin of wrapper element
+   */
   marginTop: number;
+  /**
+   * Bottom margin of wrapper element
+   */
   marginBottom: number;
+  /**
+   * Amount of space in px that the stickier element is sticking to.
+   */
   stickyFor: number;
+  /**
+   * Adds class to stickier element.
+   */
   stickyClass: string | null;
   //TODO: Add support for Element. Currently is queryString for domElement
+  /**
+   * QueryString to search for a container for the stickier element.
+   */
   stickyContainer: string;
 };
 
