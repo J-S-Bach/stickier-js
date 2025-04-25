@@ -87,7 +87,7 @@
   </head>
 
   <body>
-    <header class="top-bar" data-sticky>
+    <header class="top-bar">
       <div class="top-bar-left">
         <ul class="menu">
           <li class="menu-text">
@@ -109,70 +109,15 @@
     </header>
 
     <main>
-      <section class="container" data-sticky-container>
+      <section class="container" style="margin-bottom: 500px">
         <div class="row column">
-          <img
-            src="http://placehold.it/250x250"
-            class="float-left"
-            alt="Stickier"
-            data-sticky
-            data-sticky-for="1023"
-            data-sticky-class="is-sticky"
-            data-margin-top="100"
-            data-margin-bottom="20"
-          />
-          <div class="float-right">
-            <img
-              src="http://placehold.it/250x250"
-              alt="Stickier"
-              data-sticky
-              data-sticky-wrap
-              data-margin-top="100"
-            />
-            <img
-              src="http://placehold.it/250x125/ecf0f1?text=Not+sticky"
-              alt="Not sticky"
-            />
+          <div style="display: flex">
+            <div
+              style="background: red; width: 200px; height: 100px"
+              data-sticky-for-element
+            ></div>
+            <div style="background: blue; width: 200px; height: 100px"></div>
           </div>
-        </div>
-      </section>
-
-      <section class="container" data-sticky-container>
-        <div class="row column">
-          <img
-            src="http://placehold.it/250x250"
-            class="float-left"
-            alt="Stickier"
-            data-sticky
-            data-margin-top="100"
-          />
-          <img
-            src="http://placehold.it/250x250"
-            class="float-right"
-            alt="Stickier"
-            data-sticky
-            data-sticky-for="1023"
-            data-margin-top="100"
-          />
-        </div>
-      </section>
-
-      <section class="container" data-sticky-container>
-        <div class="row column">
-          <img
-            src="http://placehold.it/250x250"
-            class="float-left"
-            alt="Stickier"
-            data-sticky-for-element
-            data-margin-top="100"
-          />
-          <img
-            src="http://placehold.it/250x250"
-            class="float-right"
-            alt="Stickier"
-            data-sticky-for-element
-            data-margin-top="100"
-          />
         </div>
       </section>
     </main>
@@ -189,18 +134,22 @@
         ></a>
       </p>
     </footer>
-
+    <script>
+      // This is a workaround for a potential bug. Idc until it also breaks somewhere else.
+      const exports = {};
+    </script>
     <script type="text/javascript" src="../dist/stickier.compile.cjs"></script>
 
     <script>
-      console.log(Stickier)
       var sticky = new Stickier("[data-sticky]", {});
 
       const stickyElements = document.querySelectorAll(
         "[data-sticky-for-element]"
       );
 
-      var stickyWithElement = new Stickier(stickyElements);
+      console.log(stickyElements);
+
+      var stickyWithElement = new Stickier(stickyElements, { wrap: true });
     </script>
   </body>
 </html>
