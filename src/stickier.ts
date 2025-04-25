@@ -105,7 +105,7 @@ class Stickier {
     let elements: HTMLElement[];
 
     if (typeof selector === "string") {
-      // Apparently its fine to type querySelectorAll as HTMLElement
+      // Apparently its fine to type result of querySelectorAll as HTMLElement
       elements = [...document.querySelectorAll(selector)] as HTMLElement[];
     } else if (selector instanceof HTMLElement) {
       elements = [selector];
@@ -210,7 +210,7 @@ class Stickier {
       enrichableElement.sticky.container
     );
 
-    enrichableElement.sticky.rect = this.getRectangle(element);
+    enrichableElement.sticky.rect = this.getRectangle(enrichableElement);
 
     // fix when element is image that has not yet loaded and width, height = 0
     if (element.tagName.toLowerCase() === "img") {
@@ -367,7 +367,7 @@ class Stickier {
    * @param {node} element - Element that will be positioned if it's active
    */
   setPosition(element: FinalRenderElement) {
-    this.css(element, { position: "", width: "", top: "", left: "" });
+    this.css(element, { position: "", top: "", left: "" });
 
     if (this.vp.height < element.sticky.rect.height || !element.sticky.active) {
       return;
@@ -393,7 +393,6 @@ class Stickier {
         position: "fixed",
         top: element.sticky.rect.top + "px",
         left: element.sticky.rect.left + "px",
-        width: element.sticky.rect.width + "px",
       });
 
       if (element.sticky.stickyClass) {
@@ -405,7 +404,6 @@ class Stickier {
     ) {
       this.css(element, {
         position: "fixed",
-        width: element.sticky.rect.width + "px",
         left: element.sticky.rect.left + "px",
       });
 
@@ -440,10 +438,10 @@ class Stickier {
         element.classList.remove(element.sticky.stickyClass);
       }
 
-      this.css(element, { position: "", width: "", top: "", left: "" });
+      this.css(element, { position: "", top: "" });
 
       if (element.sticky.wrap) {
-        this.css(element.parentElement, { display: "", width: "", height: "" });
+        this.css(element.parentElement, { display: "", height: "" });
       }
     }
   }
@@ -501,7 +499,7 @@ class Stickier {
       !container!.parentElement?.querySelector(
         element.sticky.stickyContainer
       ) &&
-      container !== this.body
+      !container?.isSameNode(this.body)
     ) {
       container = container!.parentElement;
     }
@@ -523,7 +521,7 @@ class Stickier {
       return undefined;
     }
 
-    this.css(element, { position: "", width: "", top: "", left: "" });
+    // this.css(element, { position: "", top: "", left: "" });
 
     const width = Math.max(
       element.offsetWidth,
@@ -546,7 +544,7 @@ class Stickier {
       element = element.offsetParent;
     } while (element);
 
-    //@ts-ignore - TODO: Fix
+    //@ts-ignore - TS is lacking when narrowing down generics
     return { top, left, width, height };
   };
 
