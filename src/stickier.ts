@@ -126,7 +126,7 @@ class Stickier {
     this.body = document.querySelector("body");
 
     this.options = {
-      wrap: options.wrap || false,
+      wrap: options.wrap || true,
       wrapWith: options.wrapWith || "<span></span>",
       marginTop: options.marginTop || 0,
       marginBottom: options.marginBottom || 0,
@@ -308,7 +308,11 @@ class Stickier {
   onResizeEvents(element: FinalRenderElement) {
     this.vp = this.getViewportSize();
 
-    element.sticky.rect = this.getRectangle(element);
+    //Do resizing stuff if we know where the correct position would be. What we only know if wrapping is active
+    if (element.sticky.wrap) {
+      element.sticky.rect = this.getRectangle(element.parentElement!);
+    }
+
     element.sticky.containerRect = this.getRectangle(element.sticky.container);
 
     if (
@@ -385,9 +389,17 @@ class Stickier {
       });
     }
 
+    console.log(
+      element.sticky.rect.top,
+      //@ts-ignore
+      element.sticky.container === this.body,
+      element.sticky.container.isSameNode(this.body)
+    );
+
     if (
       element.sticky.rect.top === 0 &&
-      element.sticky.container.isSameNode(this.body)
+      //@ts-ignore
+      (element.sticky.container as HTMLBodyElement) === this.body
     ) {
       this.css(element, {
         position: "fixed",
@@ -402,6 +414,7 @@ class Stickier {
       this.scrollTop >
       element.sticky.rect.top - element.sticky.marginTop
     ) {
+      console.log("secod");
       this.css(element, {
         position: "fixed",
         left: element.sticky.rect.left + "px",
@@ -542,7 +555,10 @@ class Stickier {
       left += element.offsetLeft || 0;
       //@ts-ignore
       element = element.offsetParent;
+      console.log(element, top);
     } while (element);
+
+    console.log("final", top);
 
     //@ts-ignore - TS is lacking when narrowing down generics
     return { top, left, width, height };
