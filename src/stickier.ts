@@ -4,7 +4,7 @@
  * Sticky.js
  * Library for sticky elements written in vanilla javascript. With this library you can easily set sticky elements on your website. It's also responsive.
  *
- * @version 0.0.1
+ * @version 0.0.3
  * @author J-S-Bach
  * @website https://github.com/J-S-Bach/stickier-js
  * @repo https://github.com/J-S-Bach/stickier-js

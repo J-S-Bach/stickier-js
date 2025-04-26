@@ -1,6 +1,6 @@
 {
   "name": "stickier-js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Sticky elements with support for TS and direct Elements",
   "exports": {
     "import": "./dist/stickier.min.mjs",
