@@ -126,7 +126,7 @@ class Stickier {
     this.body = document.querySelector("body");
 
     this.options = {
-      wrap: options.wrap || false,
+      wrap: options.wrap || true,
       wrapWith: options.wrapWith || "<span></span>",
       marginTop: options.marginTop || 0,
       marginBottom: options.marginBottom || 0,

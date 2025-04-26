@@ -40,7 +40,7 @@ sticky.destroy();
 
 | Option            | Type    | Default | Description                                                                                                                         |
 | ----------------- | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| data-sticky-wrap  | boolean | false   | When it's `true` sticky element is wrapped in `<span></span>` which has sticky element dimensions. Prevents content from "jumping". |
+| data-sticky-wrap  | boolean | false   | When it's `true` sticky element is wrapped in `<span></span>` which has sticky element dimensions. Prevents content from "jumping". Defaults to true. If you disable this, you should prevent layout shifting yourself! |
 | data-margin-top   | number  | 0       | Margin between page and sticky element when scrolled                                                                                |
 | data-sticky-for   | number  | 0       | Breakpoint which when is bigger than viewport width, sticky is activated and when is smaller, then sticky is destroyed              |
 | data-sticky-class | string  | null    | Class added to sticky element when it is stuck                                                                                      |
