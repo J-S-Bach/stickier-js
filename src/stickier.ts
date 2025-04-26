@@ -389,13 +389,6 @@ class Stickier {
       });
     }
 
-    console.log(
-      element.sticky.rect.top,
-      //@ts-ignore
-      element.sticky.container === this.body,
-      element.sticky.container.isSameNode(this.body)
-    );
-
     if (
       element.sticky.rect.top === 0 &&
       //@ts-ignore
@@ -414,7 +407,6 @@ class Stickier {
       this.scrollTop >
       element.sticky.rect.top - element.sticky.marginTop
     ) {
-      console.log("secod");
       this.css(element, {
         position: "fixed",
         left: element.sticky.rect.left + "px",
@@ -555,10 +547,7 @@ class Stickier {
       left += element.offsetLeft || 0;
       //@ts-ignore
       element = element.offsetParent;
-      console.log(element, top);
     } while (element);
-
-    console.log("final", top);
 
     //@ts-ignore - TS is lacking when narrowing down generics
     return { top, left, width, height };
