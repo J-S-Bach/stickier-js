@@ -410,6 +410,8 @@ class Stickier {
       this.css(element, {
         position: "fixed",
         left: element.sticky.rect.left + "px",
+        width: element.sticky.rect.width + "px",
+        height: element.sticky.rect.height + "px",
       });
 
       if (
